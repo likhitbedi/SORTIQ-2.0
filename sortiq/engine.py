@@ -87,8 +87,16 @@ def iter_files(roots: Iterable[Path], destination: Path, recursive: bool = True,
         root = Path(requested).expanduser().resolve()
         if not root.is_dir() or inside(root, destination) or _hidden_or_system(root):
             continue
-        if os.name == "nt" and any(p.casefold() in SKIP_DIRS for p in root.parts):
-            continue
+        if os.name == "nt":
+            # Never scan Windows, Program Files or ProgramData, even when a
+            # protected location is selected indirectly. Do not reject a
+            # user's selected folder merely because an ancestor is AppData:
+            # Windows temp directories and many legitimate user folders live
+            # there (and CI test folders do as well).
+            protected = (os.environ.get("WINDIR"), os.environ.get("ProgramFiles"),
+                         os.environ.get("ProgramFiles(x86)"), os.environ.get("PROGRAMDATA"))
+            if root == Path(root.anchor) or any(inside(root, Path(p)) for p in protected if p):
+                continue
         for parent, dirs, files in os.walk(root, followlinks=False):
             if cancel is not None and cancel.is_set():
                 return
