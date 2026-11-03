@@ -13,8 +13,9 @@ def test_sve_local_and_safe(tmp_path):
     (source/'unknown.txt').write_text('miscellaneous')
     output=tmp_path/'out'
     rows=scan([source],output,vocabulary=v)
-    assert rows[0].category=='College / Marketing'
-    assert rows[1].category=='Needs Review'
+    by_name = {row.source.name: row for row in rows}
+    assert by_name['untitled.txt'].category == 'College / Marketing'
+    assert by_name['unknown.txt'].category == 'Needs Review'
     assert all(x.source.exists() for x in rows)
     result=sort_files(rows,output,[source],History(tmp_path/'h.db'),mode='copy')
     assert result.sorted==1
