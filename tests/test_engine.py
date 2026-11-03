@@ -150,3 +150,16 @@ def test_exact_keywords_not_substrings():
     assert classify("PPT_Federal_Bank.pptx", "Downloads").category == "College / Placements & Interviews"
     assert classify("Rahu_12th_House.pdf", "Downloads").category.endswith("/ Rahu")
     assert classify("particular.txt", "Downloads").category == "Needs Review"
+
+
+def test_selected_folder_beneath_appdata_is_scannable(tmp_path):
+    # Windows pytest temp folders are often beneath AppData/Local/Temp.
+    # A user-selected source there must not be rejected merely because the
+    # parent path contains AppData.
+    source = tmp_path / "AppData" / "Local" / "Temp" / "selected"
+    source.mkdir(parents=True)
+    f = source / "Federal_Bank_Interview.txt"
+    f.write_text("PGDM campus placement questions", encoding="utf-8")
+    rows = scan([source], tmp_path / "organized")
+    assert len(rows) == 1
+    assert rows[0].source == f
