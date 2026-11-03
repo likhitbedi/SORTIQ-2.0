@@ -1,0 +1,38 @@
+SORTIQ 2.0 BETA - END USER LICENSE AGREEMENT (DRAFT)
+Version 2.0 beta | Issued 3 November 2026
+
+PLEASE READ BEFORE INSTALLING OR USING SORTIQ.
+
+This End User License Agreement ("Agreement") governs installation and use of SORTIQ 2.0 Beta ("Software") distributed by the SORTIQ project ("Publisher"). By choosing "I accept" in the Windows setup wizard and installing the Software, you agree to these terms. If you do not agree, cancel installation. This is a draft for a local, personal-use product; the publisher should obtain legal review and publish verified business/contact details before public commercial distribution.
+
+1. LICENSE
+Subject to applicable law and these terms, you are granted a non-exclusive license to install, run, and use SORTIQ on computers you own or are authorized to manage. You may use the included source code for your own installations and modifications. This agreement does not grant rights to third-party trademarks or images not supplied with the Software. The SORTIQ project retains any applicable rights in its original name, branding, and source code, subject to rights held by contributors and third-party licensors.
+
+2. PERMISSIONS AND USER RESPONSIBILITY
+The Software accesses only source folders selected by the user, except that it reads/writes its own settings, operation history, demo files if requested, and the user-selected destination library. You must have permission to read, copy, and move files you direct the Software to process. You are responsible for checking the proposed categories and destination paths, and for keeping backups of important files. Do not use the Software to access another person's files without authorization.
+
+3. AUTOMATED CLASSIFICATION LIMITATIONS
+SORTIQ applies locally run semantic-embedding inference when explicitly enabled and installed, plus keyword/rule-based heuristics. Inferred category relevance measures are not validated probabilities. Incorrect or incomplete routing may occur. Some scanned PDFs, images, videos, encrypted files and unsupported formats cannot be understood. Automatic Copy mode may proceed for sufficiently strong matches without individual file review. For this reason, originals are retained. You accept that outputs must be reviewed periodically and that SORTIQ is not guaranteed accurate.
+
+4. FILE OPERATIONS AND BACKUPS
+A scan itself does not intentionally copy, move, modify, or delete source files. Copy mode is the default and retains originals. Move mode changes file locations after user confirmation. SORTIQ attempts to avoid overwrites, logs operations, and offers limited undo, but undo may fail if files are edited, moved, deleted, locked, or otherwise changed. No software can guarantee complete protection against power loss, disk failure, corruption, or interrupted operations. Keep independent backups before using Move mode.
+
+5. PRIVACY AND LOCAL PROCESSING
+This release does not send scanned filenames, document contents, or classification results to any cloud service. File classification happens locally. Settings include selected source/destination folder paths. Operation history stores source and destination paths, a file digest, operation type, and status in a local SQLite database. Optional online vocabulary discovery sends only user-created subject names and seed keywords to Wikipedia after confirmation. Opting into an on-device semantic model downloads public AI model weights from a third-party model repository. Such requests may disclose IP address and download metadata, but not local file contents. See the included Privacy Policy for details. Installing Python dependencies or obtaining updates, if you choose to do so, can involve connections to external package repositories; those network interactions are separate from SORTIQ's file scanner.
+
+6. THIRD-PARTY COMPONENTS
+The Software may bundle or depend on Python, Tk, pypdf, python-docx, python-pptx, openpyxl, FastEmbed, ONNX Runtime, tokenizers, model weights, PyInstaller and their dependencies. Those components are subject to their respective licenses. This Agreement does not supersede or restrict rights granted by those licenses. Review bundled or upstream third-party notices when distributing packaged builds.
+
+7. NO WARRANTY
+TO THE EXTENT PERMITTED BY APPLICABLE LAW, THE SOFTWARE IS PROVIDED "AS IS" AND "AS AVAILABLE", WITHOUT WARRANTIES OF ANY KIND, INCLUDING MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT. THE SOFTWARE IS NOT A BACKUP SYSTEM OR A GUARANTEE AGAINST DATA LOSS. NOTHING IN THIS AGREEMENT EXCLUDES WARRANTIES THAT CANNOT LEGALLY BE EXCLUDED.
+
+8. LIMITATION OF LIABILITY
+TO THE EXTENT PERMITTED BY APPLICABLE LAW, THE PUBLISHER AND CONTRIBUTORS ARE NOT LIABLE FOR INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, OR LOST PROFITS OR DATA, ARISING FROM USE OF THE SOFTWARE. NOTHING EXCLUDES LIABILITY THAT CANNOT LEGALLY BE LIMITED.
+
+9. UNINSTALLATION
+You may uninstall SORTIQ using Windows Settings > Installed Apps or the Start Menu uninstall shortcut. Uninstallation removes installed program files and shortcuts. It does not intentionally delete your original documents, organized library, selected destination folders, or separately stored preferences/history. Those files remain under your control.
+
+10. CHANGES AND SEVERABILITY
+A future version may offer revised terms. This version does not automatically update itself. If a provision of this Agreement is unenforceable under applicable law, the remaining provisions continue to apply to the extent permitted.
+
+END OF AGREEMENT

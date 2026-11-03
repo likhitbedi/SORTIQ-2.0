@@ -1,0 +1,20 @@
+SORTIQ 2.0 BETA — PRIVACY NOTICE (PROTOTYPE)
+Updated 3 November 2026
+
+1. SELECTED FILES. SORTIQ inspects files and subfolders within locations you explicitly select. It skips hidden, symlinked and known application/system paths, and excludes the organized destination library from scans. It cannot guarantee that every selected file is safe to analyze; select only folders you own or are authorized to process.
+
+2. ON-DEVICE DOCUMENT ANALYSIS. Supported text content is extracted on your PC. Local embedding inference uses a locally installed ONNX model. SORTIQ does not upload file contents, filenames or extracted text to a cloud AI service in this prototype. Some file formats are not analyzed beyond filenames/file type.
+
+3. ONE-TIME MODEL DOWNLOAD. If you enable the local AI option, SORTIQ fetches a public model (currently BAAI/bge-small-en-v1.5) from the model provider's servers and caches its weights on your device. This sends normal network requests, potentially exposing your IP address and download metadata to those providers. No private file contents are sent. The model can be loaded offline after a successful download. If you do not opt in or it fails, SORTIQ explicitly indicates keyword-only fallback mode.
+
+4. ONLINE VOCABULARY. V1.3's optional Find Related Terms feature may search Wikipedia for a subject name and user-provided seed terms. It is not required for automatic organization; only launch it if you are comfortable sharing those user-entered terms with Wikipedia.
+
+5. LOCAL STORAGE. The app stores profile description, source/destination paths and preferences in your per-user SORTIQ application-data directory. It caches up to 42,000 characters of extracted text from inspected documents and optional embedding vectors in a local SQLite database to speed up repeat scans. The analysis cache is not encrypted independently of your operating system. Clear it through Actions > Clear local analysis cache. Operation history stores file paths, hashes and statuses in SQLite. Windows uninstall may retain these user data files and the organized library.
+
+6. FILE OPERATIONS. Automatic mode copies high-evidence files and leaves uncertain files untouched. Original source files are not automatically deleted. Manual Move mode is separate and requires confirmation. SORTIQ is not a backup service. Undo can fail if files were edited or changed after organization.
+
+7. NO USER TRACKING. This prototype does not implement accounts, analytics, telemetry or advertising trackers. It does not automatically check for software updates.
+
+8. LIMITATIONS. Classification can be wrong. A local AI model is not guaranteed to be accurate, safe, fair, or effective for any given domain. PDF scans without extractable text, encrypted files, complex layouts and videos may need additional tools. The current default embedding model is English-oriented.
+
+This notice is a functional prototype description, NOT a final commercial privacy policy. A privacy/legal audit, licensing review, security testing, and signed-release process are mandatory before public sale.
