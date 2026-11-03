@@ -12,7 +12,7 @@ def test_profile_from_free_text_and_saved(tmp_path):
     assert "College / Marketing & Branding" in p["categories"]
     assert "Astro Business / Horoscope Analysis" in p["categories"]
     assert "Astro Business / CRM & Software" in p["categories"]
-    assert not p["ai_enabled"]
+    assert p["ai_enabled"]
     fp=tmp_path / "profile.json"
     save_profile(p, fp)
     assert load_profile(fp)["description"] == p["description"]
@@ -132,8 +132,36 @@ def test_semantic_model_path_with_cached_embeddings(tmp_path):
     assert first[0].category==second[0].category
     assert "Local AI" in first[0].explanation
 
-def test_no_ai_download_without_consent(tmp_path):
-    model=LocalSemanticModel(consent_to_download=False,model_dir=tmp_path/"model")
+def test_missing_bundled_ai_does_not_download(tmp_path):
+    model_dir=tmp_path/"missing-model"
+    model=LocalSemanticModel(model_dir=model_dir)
     assert model.start() is False
-    assert not (tmp_path/"model").exists()
-    assert model.engine is None
+    assert not model_dir.exists()
+    assert "Reinstall" in model.error
+
+
+def test_bundled_ai_uses_specific_model_path_offline(tmp_path, monkeypatch):
+    import fastembed
+    from sortiq.autopilot import load_profile
+    import json
+    from pathlib import Path
+    folder=tmp_path/"ai-model"
+    folder.mkdir()
+    (folder/"placeholder").write_text("dummy")
+    calls=[]
+    class FakeModel:
+        def __init__(self, **kwargs): calls.append(kwargs)
+        def embed(self, texts, **kwargs):
+            yield [1.0]*384
+    monkeypatch.setattr(fastembed, "TextEmbedding", FakeModel)
+    model=LocalSemanticModel(model_dir=folder)
+    assert model.start() is True, model.error
+    assert calls==[{"model_name":model.MODEL,
+                    "specific_model_path":str(folder.resolve()),
+                    "local_files_only":True}]
+    assert len(model.embed(["hello"])[0])==384
+    profile=create_profile("I am a college student studying marketing, branding and finance")
+    profile["ai_enabled"]=False
+    file=tmp_path/"profile.json"
+    file.write_text(json.dumps(profile),encoding="utf-8")
+    assert load_profile(file)["ai_enabled"] is True

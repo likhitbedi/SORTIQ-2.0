@@ -34,6 +34,11 @@ jobs:
         run: |
           python -m PyInstaller --noconfirm --clean --windowed --onedir --name SORTIQ --icon "assets/icons/sortiq.ico" --add-data "assets;assets" --add-data "docs;docs" --collect-submodules pypdf --collect-submodules pptx --collect-submodules docx --collect-submodules openpyxl --collect-all fastembed --collect-all onnxruntime --collect-all tokenizers --collect-all huggingface_hub main.py
           if (!(Test-Path 'dist/SORTIQ/SORTIQ.exe')) { throw 'SORTIQ.exe was not produced.' }
+      - name: Fetch and include the complete ONNX model and tokenizer in Windows distribution
+        shell: pwsh
+        run: |
+          python scripts/bundle_ai_model.py --output dist/SORTIQ/ai-model
+          if (!(Test-Path 'dist/SORTIQ/ai-model/sortiq-model.json')) { throw 'AI model was not bundled' }
       - name: Smoke-test the packaged executable (without downloading a model)
         shell: pwsh
         run: |
@@ -47,8 +52,7 @@ jobs:
       - name: Test real local AI model inside packaged windowed EXE
         shell: pwsh
         run: |
-          # A plain --self-test never loads FastEmbed. Verify ONNX inference
-          # with the console-free executable, including first model download.
+          # Verify that the packaged model runs with every network connection blocked.
           $exe = (Resolve-Path 'dist/SORTIQ/SORTIQ.exe').Path
           $result = Start-Process -FilePath $exe -ArgumentList '--ai-self-test' -Wait -PassThru
           Write-Host "Packaged local AI exit code: $($result.ExitCode)"
@@ -57,6 +61,13 @@ jobs:
             if (Test-Path $diagnostic) { Get-Content $diagnostic }
             throw "Packaged local AI failed: exit $($result.ExitCode)"
           }
+      - name: Verify complete on-device model payload
+        shell: pwsh
+        run: |
+          $dir = 'dist/SORTIQ/ai-model'
+          $total = (Get-ChildItem $dir -Recurse -File | Measure-Object Length -Sum).Sum
+          Write-Host "AI model bytes bundled: $total"
+          if ($total -lt 40000000) { throw 'Model files are too small for a valid offline bundle' }
       - name: Create a portable ZIP containing SORTIQ.exe
         shell: pwsh
         run: |
@@ -83,11 +94,11 @@ jobs:
           if (-not $iscc) { throw 'Inno Setup compiler ISCC.exe not found' }
           & $iscc 'installer/SORTIQ_Setup.iss'
           if ($LASTEXITCODE -ne 0) { throw 'Inno Setup compilation failed' }
-          if (!(Test-Path 'installer/Output/SORTIQ_2.0_Beta_Setup.exe')) { throw 'Setup.exe not produced' }
+          if (!(Test-Path 'installer/Output/SORTIQ_2.0.2_Beta_Setup.exe')) { throw 'Setup.exe not produced' }
       - name: Upload Windows setup wizard
         uses: actions/upload-artifact@v4
         with:
           name: SORTIQ-Windows-Installer
-          path: installer/Output/SORTIQ_2.0_Beta_Setup.exe
+          path: installer/Output/SORTIQ_2.0.2_Beta_Setup.exe
           retention-days: 14
           if-no-files-found: error

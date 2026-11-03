@@ -515,14 +515,12 @@ class SortiqApp(tk.Tk):
 
         def job():
             try:
-                model = LocalSemanticModel(consent_to_download=bool(profile.get("ai_enabled")))
-                self.jobs.put(("progress", "Loading local AI model; initial download can take time..."))
-                model_ok = model.start()
-                if profile.get("ai_enabled") and not model_ok:
-                    self.jobs.put(("error", "Local AI was requested but could not load. No files were copied. "
-                                          + model.error[:400] + ". Check the internet/model installation and retry."))
+                model = LocalSemanticModel()
+                self.jobs.put(("progress", "Loading included AI model (offline)..."))
+                if not model.start():
+                    self.jobs.put(("error", "Included AI could not start. No files were copied. " + model.error[:450]))
                     return
-                ai_note = "Local AI semantic embeddings" if model.engine else "Keywords only — local AI unavailable"
+                ai_note = "Bundled local AI (offline)"
                 self.jobs.put(("progress", f"{ai_note}. Inspecting documents..."))
                 classifier = HybridClassifier(profile, model)
                 rows = auto_scan(roots, root, classifier, cancel=self.cancel_event,

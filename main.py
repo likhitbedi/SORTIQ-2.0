@@ -35,24 +35,32 @@ def self_test() -> None:
 
 
 def ai_self_test() -> None:
-    """Real model download, initialization and inference on a Windows build runner.
+    """Verify installed AI inference offline on a clean Windows build runner.
 
-    No user documents are read or uploaded. Writes traceback to RUNNER_TEMP
-    so failures in a console-less executable can be diagnosed in CI.
+    No user documents are accessed. Tracebacks are saved for console-free CI.
     """
     from pathlib import Path
     import traceback
     try:
         from sortiq.autopilot import LocalSemanticModel
-        model = LocalSemanticModel(consent_to_download=True)
-        if not model.start():
-            raise RuntimeError(model.error or "Local AI model failed to initialize")
-        vectors = model.embed([
-            "Marketing segmentation positioning brand equity research and consumer behavior."
-        ])
-        if len(vectors) != 1 or len(vectors[0]) < 64:
-            raise RuntimeError("Model produced missing or invalid embedding vectors")
-        print(f"SORTIQ local AI verified: {len(vectors[0])} dimensions")
+        import socket
+        os.environ["HF_HUB_OFFLINE"] = "1"
+        original_connect = socket.socket.connect
+        def refuse_network(self, address):
+            raise RuntimeError(f"Unexpected network access during offline AI test: {address}")
+        socket.socket.connect = refuse_network
+        try:
+            model = LocalSemanticModel()
+            if not model.start():
+                raise RuntimeError(model.error or "Bundled AI unavailable")
+            vectors = model.embed([
+                "Marketing segmentation positioning brand equity research and consumer behavior."
+            ])
+        finally:
+            socket.socket.connect = original_connect
+        if len(vectors) != 1 or len(vectors[0]) != 384:
+            raise RuntimeError("Bundled AI model did not generate 384-dimensional vectors")
+        print("SORTIQ model inference verified offline")
     except Exception:
         runner_temp = os.environ.get("RUNNER_TEMP")
         if runner_temp:

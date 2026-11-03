@@ -1,4 +1,4 @@
-"""One-time, low-friction profile setup. Keeps documents local and asks before model download."""
+"""One-time, low-friction profile setup. AI and tokenizer are already included in the Windows installer."""
 from __future__ import annotations
 import tkinter as tk
 from tkinter import filedialog, messagebox, ttk
@@ -50,12 +50,9 @@ class Onboarding(tk.Toplevel):
         self.destination_var = tk.StringVar(value=parent.destination_var.get())
         ttk.Entry(destination, textvariable=self.destination_var).pack(side="left",fill="x",expand=True)
         ttk.Button(destination, text="Browse...", command=self.choose_destination).pack(side="left",padx=(6,0))
-        ttk.Label(wrap, text="4. Local AI setup", font=("Segoe UI", 11, "bold")).pack(anchor="w",pady=(9,4))
-        self.ai_consent = tk.BooleanVar(value=bool(parent.profile and parent.profile.get("ai_enabled")))
-        ttk.Checkbutton(wrap, variable=self.ai_consent, text="Allow one-time download of a local AI model (~67 MB)").pack(anchor="w")
-        note = ("Documents remain on this PC. Only public model files are downloaded. "
-                "Without the model, SORTIQ uses a less capable keyword fallback. "
-                "Unsupported/scanned files may remain unclassified.")
+        ttk.Label(wrap, text="4. On-device AI — included with SORTIQ", font=("Segoe UI", 11, "bold")).pack(anchor="w",pady=(9,4))
+        note = ("The AI model is already installed. No internet or extra download is needed. "
+                "Documents are analyzed on this PC. Unreadable or uncertain files stay untouched.")
         tk.Label(wrap, text=note, wraplength=695, justify="left", fg="#555555").pack(anchor="w",pady=4)
         ttk.Label(wrap,text="Safety: automatically COPY confidently classified files. Original files stay untouched.",
                   foreground="#166b42").pack(anchor="w",pady=(7,3))
@@ -88,16 +85,11 @@ class Onboarding(tk.Toplevel):
     def finish(self, start: bool = True):
         try:
             description=self.description.get("1.0","end").strip()
-            profile=create_profile(description,self.ai_consent.get())
+            profile=create_profile(description)
             if not self.folders:
                 messagebox.showerror("Choose a folder","Add at least one folder first.", parent=self);return
             if not self.destination_var.get().strip():
                 raise ValueError("Choose a destination folder for organized copies")
-            if start and not self.ai_consent.get():
-                proceed = messagebox.askyesno("Local AI is disabled",
-                    "Without the downloaded local model, SORTIQ can only do conservative keyword matching.\n\n"
-                    "Continue with keyword-only sorting instead?", parent=self)
-                if not proceed: return
             save_profile(profile)
         except (ValueError,OSError) as exc:
             messagebox.showerror("Could not save setup",str(exc),parent=self);return

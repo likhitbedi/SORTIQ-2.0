@@ -8,6 +8,7 @@ from __future__ import annotations
 import json
 import math
 import os
+import sys
 import re
 import sqlite3
 import threading
@@ -94,7 +95,7 @@ GENERAL = {
 }
 
 # User descriptions remain local, and categories are also configurable after setup.
-def create_profile(description: str, model_enabled: bool = False) -> dict:
+def create_profile(description: str, model_enabled: bool = True) -> dict:
     description = re.sub(r"\s+", " ", description.strip())
     if len(description) < 18:
         raise ValueError("Tell SORTIQ more about your work, studies and types of documents (at least 18 characters).")
@@ -117,7 +118,7 @@ def create_profile(description: str, model_enabled: bool = False) -> dict:
         selected[f"Work / {label[:48]}"] = description[:700]
     selected.update(GENERAL)
     for key in selected: valid_category(key)
-    return {"description": description, "categories": selected, "ai_enabled": bool(model_enabled), "created_at": int(time.time()), "version": 2}
+    return {"description": description, "categories": selected, "ai_enabled": True, "created_at": int(time.time()), "version": 2}
 
 
 def profile_path() -> Path:
@@ -131,6 +132,7 @@ def load_profile(path: Path | None = None) -> dict | None:
         if not isinstance(obj, dict) or not obj.get("description") or not isinstance(obj.get("categories"), dict):
             return None
         for c in obj["categories"]: valid_category(c)
+        obj["ai_enabled"] = True  # Migrate older profiles; the model is now bundled.
         return obj
     except (OSError, ValueError, TypeError, KeyError):
         return None
@@ -174,43 +176,47 @@ class AutoDecision:
     candidate: str = ""
 
 
+def installed_model_path() -> Path:
+    """Find a packaged on-device model; never download into user caches."""
+    override = os.environ.get("SORTIQ_MODEL_DIR", "").strip()
+    if override:
+        return Path(override).expanduser().resolve()
+    if getattr(sys, "frozen", False):
+        return Path(sys.executable).resolve().parent / "ai-model"
+    return Path(__file__).resolve().parents[1] / "ai-model"
+
+
 class LocalSemanticModel:
-    """Optional local ONNX embedding model. Downloads weights only with express permission."""
+    """Use bundled ONNX model files entirely offline."""
     MODEL = "BAAI/bge-small-en-v1.5"
 
-    def __init__(self, consent_to_download: bool = False, model_dir: Path | None = None):
-        self.consent_to_download = consent_to_download
-        self.model_dir = model_dir or (app_data_dir() / "models")
+    def __init__(self, model_dir: Path | None = None):
+        self.model_dir = Path(model_dir) if model_dir is not None else installed_model_path()
         self.engine = None
         self.error = ""
 
     def start(self) -> bool:
-        if not self.consent_to_download:
-            self.error = "Local AI has not been enabled in the first-run privacy settings"
+        if not self.model_dir.is_dir() or not any(self.model_dir.iterdir()):
+            self.error = ("Bundled AI files are missing: " + str(self.model_dir) +
+                          ". Reinstall SORTIQ with its ai-model folder.")
             return False
         try:
+            os.environ["HF_HUB_OFFLINE"] = "1"
+            os.environ["HF_HUB_DISABLE_TELEMETRY"] = "1"
             from fastembed import TextEmbedding
-            # A first-run download is permitted only if the user opted in.
-            # local_files_only prevents silently contacting Hugging Face on later runs.
-            marker = self.model_dir / ".sortiq-model-ready"
-            try:
-                self.engine = TextEmbedding(model_name=self.MODEL, cache_dir=str(self.model_dir),
-                                            local_files_only=marker.exists())
-            except Exception:
-                # With the user's consent, retry a damaged or incomplete cache online.
-                self.engine = TextEmbedding(model_name=self.MODEL, cache_dir=str(self.model_dir),
-                                            local_files_only=False)
-            self.model_dir.mkdir(parents=True, exist_ok=True)
-            marker.write_text(self.MODEL, encoding="utf-8")
+            self.engine = TextEmbedding(model_name=self.MODEL,
+                                        specific_model_path=str(self.model_dir.resolve()),
+                                        local_files_only=True)
             return True
         except Exception as exc:
             self.engine = None
-            self.error = f"Local AI unavailable: {type(exc).__name__}: {exc}"
+            self.error = (f"Installed AI failed to initialize: {type(exc).__name__}: {exc}. "
+                          "Please reinstall SORTIQ.")
             return False
 
     def embed(self, texts: list[str]) -> list[list[float]]:
         if self.engine is None:
-            raise RuntimeError("AI model is not ready")
+            raise RuntimeError("Bundled AI model is not ready")
         return [list(map(float, v)) for v in self.engine.embed(texts, batch_size=16)]
 
 

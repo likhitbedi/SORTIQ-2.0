@@ -5,7 +5,7 @@ Updated 3 November 2026
 
 2. ON-DEVICE DOCUMENT ANALYSIS. Supported text content is extracted on your PC. Local embedding inference uses a locally installed ONNX model. SORTIQ does not upload file contents, filenames or extracted text to a cloud AI service in this prototype. Some file formats are not analyzed beyond filenames/file type.
 
-3. ONE-TIME MODEL DOWNLOAD. If you enable the local AI option, SORTIQ fetches a public model (currently BAAI/bge-small-en-v1.5) from the model provider's servers and caches its weights on your device. This sends normal network requests, potentially exposing your IP address and download metadata to those providers. No private file contents are sent. The model can be loaded offline after a successful download. If you do not opt in or it fails, SORTIQ explicitly indicates keyword-only fallback mode.
+3. INCLUDED OFFLINE AI MODEL. The SORTIQ installer includes the BAAI/bge-small-en-v1.5 ONNX model and tokenizer. The model is fetched only by the software build process, never by a customer's installed SORTIQ application. On-device inference runs offline. If the bundled model is missing or damaged, automatic processing stops safely rather than downloading a replacement or copying documents without AI.
 
 4. ONLINE VOCABULARY. V1.3's optional Find Related Terms feature may search Wikipedia for a subject name and user-provided seed terms. It is not required for automatic organization; only launch it if you are comfortable sharing those user-entered terms with Wikipedia.
 

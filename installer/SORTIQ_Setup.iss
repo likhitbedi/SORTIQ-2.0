@@ -1,7 +1,7 @@
 ; SORTIQ Windows installation wizard - compile with Inno Setup 6.
 ; Produces Output/SORTIQ_2.0_Beta_Setup.exe after the Windows app has been built.
 #define AppName "SORTIQ"
-#define AppVersion "2.0.1-beta"
+#define AppVersion "2.0.2-beta"
 #define AppExe "SORTIQ.exe"
 
 [Setup]
@@ -13,7 +13,7 @@ AppPublisher=SORTIQ Project
 DefaultDirName={localappdata}\Programs\SORTIQ
 DefaultGroupName=SORTIQ
 OutputDir=Output
-OutputBaseFilename=SORTIQ_2.0_Beta_Setup
+OutputBaseFilename=SORTIQ_2.0.2_Beta_Setup
 SetupIconFile=..\assets\icons\sortiq.ico
 UninstallDisplayIcon={app}\{#AppExe}
 WizardStyle=modern
