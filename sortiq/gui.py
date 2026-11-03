@@ -56,6 +56,7 @@ class SortiqApp(tk.Tk):
         self.vocab_path = app_data_dir() / "vocabulary.json"
         self.vocab = Vocabulary.load(self.vocab_path)
         self.profile = load_profile()
+        self._setup_window = None  # Exactly one first-run wizard per application window.
         if self.profile: register_profile(self.profile)
         self.folders: list[str] = [p for p in self.settings.get("folders", []) if Path(p).is_dir()]
         self.rows: list[Suggestion] = []
@@ -460,11 +461,22 @@ class SortiqApp(tk.Tk):
             messagebox.showerror("Cache deletion failed", str(exc))
 
     def setup_assistant(self):
+        # The startup timer, toolbar, or AI Organize can all request setup.
+        # Reuse the existing modal instead of opening a second copy.
+        if self._setup_window is not None:
+            try:
+                if self._setup_window.winfo_exists():
+                    self._setup_window.lift()
+                    self._setup_window.focus_force()
+                    return
+            except tk.TclError:
+                pass
+            self._setup_window = None
         if self.busy:
             messagebox.showinfo("SORTIQ", "Finish the current file operation first.")
             return
-        Onboarding(self, self._onboarding_complete,
-                   current_description=self.profile.get("description", "") if self.profile else "")
+        self._setup_window = Onboarding(self, self._onboarding_complete,
+                                        current_description=self.profile.get("description", "") if self.profile else "")
 
     def _onboarding_complete(self, profile: dict, folders: list[str], auto_start: bool, destination: str):
         self.profile = profile
@@ -607,16 +619,19 @@ class SortiqApp(tk.Tk):
             pass
         if self.winfo_exists():
             self.after(120, self._poll_jobs)
-        if not self.profile:
-            self.after(700, self.setup_assistant)
+        # First-run setup is scheduled only once in __init__.
+        # Scheduling it here opened an unbounded number of dialogs.
 
     def _busy(self, value: bool, message: str):
         self.busy = value
         self.message_var.set(message)
         state = "disabled" if value else "normal"
-        self.scan_button.configure(state=state)
-        self.sort_button.configure(state=state)
-        self.undo_button.configure(state=state)
+        # The classic UI no longer has the legacy scan_button / sort_button.
+        # Disable only controls that exist in this simplified toolbar.
+        for button_name in ("auto_button", "undo_button"):
+            button = getattr(self, button_name, None)
+            if button is not None:
+                button.configure(state=state)
 
     def _sort_by(self, key: str):
         if self.sort_key == key:
