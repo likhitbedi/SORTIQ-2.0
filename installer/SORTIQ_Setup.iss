@@ -1,7 +1,7 @@
 ; SORTIQ Windows installation wizard - compile with Inno Setup 6.
 ; Produces Output/SORTIQ_2.0_Beta_Setup.exe after the Windows app has been built.
 #define AppName "SORTIQ"
-#define AppVersion "2.0.0-beta"
+#define AppVersion "2.0.1-beta"
 #define AppExe "SORTIQ.exe"
 
 [Setup]
