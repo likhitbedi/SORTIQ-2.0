@@ -37,8 +37,13 @@ jobs:
       - name: Smoke-test the packaged executable (without downloading a model)
         shell: pwsh
         run: |
-          & 'dist/SORTIQ/SORTIQ.exe' --self-test
-          if ($LASTEXITCODE -ne 0) { throw 'Packaged EXE self-test failed' }
+          # PowerShell does not reliably wait for a windowed Windows executable
+          # when invoked with the call operator. Start-Process -Wait is required
+          # before inspecting the exit code.
+          $exe = (Resolve-Path 'dist/SORTIQ/SORTIQ.exe').Path
+          $result = Start-Process -FilePath $exe -ArgumentList '--self-test' -Wait -PassThru
+          Write-Host "Packaged application exit code: $($result.ExitCode)"
+          if ($result.ExitCode -ne 0) { throw "Packaged EXE self-test failed: exit $($result.ExitCode)" }
       - name: Create a portable ZIP containing SORTIQ.exe
         shell: pwsh
         run: |
