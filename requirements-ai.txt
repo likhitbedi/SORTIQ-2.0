@@ -1,0 +1,2 @@
+# Local ONNX embedding inference on the customer's device (the model itself is opt-in)
+fastembed>=0.6,<1
