@@ -1,0 +1,33 @@
+name: Publish SORTIQ 2.0.3 public installer
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/publish-release.yml']
+permissions:
+  contents: write
+  actions: read
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get the tested Windows setup file
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh run download 41808541223 --repo "$GITHUB_REPOSITORY" --name SORTIQ-Windows-Installer --dir installer
+          test -s installer/SORTIQ_2.0.3_Beta_Setup.exe
+          test "$(head -c 2 installer/SORTIQ_2.0.3_Beta_Setup.exe)" = MZ
+          sha256sum installer/SORTIQ_2.0.3_Beta_Setup.exe
+      - name: Publish GitHub Release for public downloads
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag=v2.0.3-beta
+          asset=installer/SORTIQ_2.0.3_Beta_Setup.exe
+          if gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release upload "$tag" "$asset" --clobber --repo "$GITHUB_REPOSITORY"
+          else
+            gh release create "$tag" "$asset" --target main --prerelease --repo "$GITHUB_REPOSITORY" --title "SORTIQ 2.0.3 Beta - Made by Likhit Bedi" --notes "Windows 10/11 installer. Offline AI is bundled: no Python or extra model download required. Unsigned beta: scan the installer, and test with sample folders first."
+          fi
+          gh release view "$tag" --repo "$GITHUB_REPOSITORY" --json url,assets
