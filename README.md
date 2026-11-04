@@ -1,4 +1,6 @@
-# SORTIQ 2.0 Beta — AI Automatic File Organizer
+# SORTIQ 2.0.3 Beta — AI Automatic File Organizer
+
+**Made by Likhit Bedi.**
 
 **Status: functional desktop prototype, not a verified commercial product.**
 
@@ -19,7 +21,7 @@ The first time a customer launches SORTIQ, an onboarding dialog asks **what work
 The included **GitHub Actions Windows build** (`.github/workflows/build-windows.yml`) runs on a Windows runner and installs the dependencies there. If the build passes, its artifacts are:
 
 - `SORTIQ-Windows-Portable`: ZIP containing `SORTIQ.exe` and runtime dependencies; unzip and double-click `SORTIQ.exe`.
-- `SORTIQ-Windows-Installer`: `SORTIQ_2.0_Beta_Setup.exe`; double-click for the install wizard (license/privacy text, install path, desktop shortcut, uninstall support).
+- `SORTIQ-Windows-Installer`: `SORTIQ_2.0.3_Beta_Setup.exe`; double-click for the install wizard (license/privacy text, install path, desktop shortcut, uninstall support).
 
 **These files are not precompiled in this ZIP.** Publish the extracted project as a *private* GitHub repository, go to **Actions > Build SORTIQ 2.0 for Windows > Run workflow**, and download the artifacts after a successful run. The workflow itself has not been executed or verified on a Windows runner in this environment.
 

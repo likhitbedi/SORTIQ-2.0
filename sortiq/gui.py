@@ -16,7 +16,7 @@ from pathlib import Path
 import tkinter as tk
 from tkinter import filedialog, messagebox, ttk, scrolledtext
 
-from . import __version__
+from . import __version__, MAKER_CREDIT
 from .config import load, save
 from .engine import History, Suggestion, default_library, inside, override, scan, sort_files, undo_last
 from .taxonomy import CATEGORY_TREE
@@ -47,7 +47,7 @@ def fmt_size(count: int) -> str:
 class SortiqApp(tk.Tk):
     def __init__(self):
         super().__init__()
-        self.title(f"SORTIQ Classic  -  File Organizer  v{__version__}")
+        self.title(f"SORTIQ Classic - File Organizer v{__version__} | {MAKER_CREDIT}")
         self.geometry("1210x720")
         self.minsize(940, 550)
         self.configure(bg=BG)
@@ -183,7 +183,7 @@ class SortiqApp(tk.Tk):
         helpmenu.add_command(label="License agreement", command=lambda: self.show_document("EULA.txt", "SORTIQ License Agreement"))
         helpmenu.add_command(label="Privacy policy", command=lambda: self.show_document("PRIVACY.txt", "SORTIQ Privacy Policy"))
         helpmenu.add_command(label="About SORTIQ", command=lambda: messagebox.showinfo(
-            "About SORTIQ", "SORTIQ Classic — selected-folder organizer.\n\n"
+            "About SORTIQ", f"SORTIQ Classic — selected-folder organizer.\n{MAKER_CREDIT}\n\n"
             "Preview categories before copying or moving. No cloud uploads.\n"
             "For safety, Copy is the default. Undo reverses the last batch."))
         bar.add_cascade(label="Help", menu=helpmenu)
@@ -217,6 +217,10 @@ class SortiqApp(tk.Tk):
         ttk.Separator(bar, orient="vertical").pack(side="left", fill="y", padx=7, pady=6)
         action("AI Setup", "why", self.setup_assistant)
         action("Advanced", "scan", self.toggle_advanced)
+        # Permanent maker credit, right-aligned and separate from toolbar actions.
+        tk.Label(bar, text=MAKER_CREDIT, bg=BG, fg="#405166",
+                 font=(FONT, 10, "bold"), anchor="e").pack(
+                     side="right", padx=(12, 10), pady=(12, 8))
 
     def _address_bar(self):
         frame = ttk.Frame(self, padding=(12, 3, 12, 7))

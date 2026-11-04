@@ -94,11 +94,11 @@ jobs:
           if (-not $iscc) { throw 'Inno Setup compiler ISCC.exe not found' }
           & $iscc 'installer/SORTIQ_Setup.iss'
           if ($LASTEXITCODE -ne 0) { throw 'Inno Setup compilation failed' }
-          if (!(Test-Path 'installer/Output/SORTIQ_2.0.2_Beta_Setup.exe')) { throw 'Setup.exe not produced' }
+          if (!(Test-Path 'installer/Output/SORTIQ_2.0.3_Beta_Setup.exe')) { throw 'Setup.exe not produced' }
       - name: Upload Windows setup wizard
         uses: actions/upload-artifact@v4
         with:
           name: SORTIQ-Windows-Installer
-          path: installer/Output/SORTIQ_2.0.2_Beta_Setup.exe
+          path: installer/Output/SORTIQ_2.0.3_Beta_Setup.exe
           retention-days: 14
           if-no-files-found: error

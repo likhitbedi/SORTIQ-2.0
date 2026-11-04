@@ -1,7 +1,7 @@
 ; SORTIQ Windows installation wizard - compile with Inno Setup 6.
 ; Produces Output/SORTIQ_2.0_Beta_Setup.exe after the Windows app has been built.
 #define AppName "SORTIQ"
-#define AppVersion "2.0.2-beta"
+#define AppVersion "2.0.3-beta"
 #define AppExe "SORTIQ.exe"
 
 [Setup]
@@ -9,11 +9,11 @@ AppId={{CFDA6F22-FA85-4BE5-B251-8B104149A3C0}
 AppName={#AppName}
 AppVerName={#AppName} {#AppVersion}
 AppVersion={#AppVersion}
-AppPublisher=SORTIQ Project
+AppPublisher=Likhit Bedi
 DefaultDirName={localappdata}\Programs\SORTIQ
 DefaultGroupName=SORTIQ
 OutputDir=Output
-OutputBaseFilename=SORTIQ_2.0.2_Beta_Setup
+OutputBaseFilename=SORTIQ_2.0.3_Beta_Setup
 SetupIconFile=..\assets\icons\sortiq.ico
 UninstallDisplayIcon={app}\{#AppExe}
 WizardStyle=modern
@@ -46,3 +46,11 @@ Name: "{userdesktop}\SORTIQ"; Filename: "{app}\{#AppExe}"; Tasks: desktopicon
 
 [Run]
 Filename: "{app}\{#AppExe}"; Description: "Launch SORTIQ"; Flags: nowait postinstall skipifsilent
+
+[Code]
+procedure InitializeWizard();
+begin
+  { Show the maker on the installer welcome page. }
+  WizardForm.WelcomeLabel2.Caption :=
+    WizardForm.WelcomeLabel2.Caption + #13#10 + #13#10 + 'Made by Likhit Bedi';
+end;
