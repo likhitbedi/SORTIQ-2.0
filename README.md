@@ -2,6 +2,13 @@
 
 **Made by Likhit Bedi.**
 
+## Download SORTIQ for Windows
+
+**[Download SORTIQ 2.0.3 Beta Windows Setup (EXE)](https://github.com/likhitbedi/SORTIQ-2.0/releases/download/v2.0.3-beta/SORTIQ_2.0.3_Beta_Setup.exe)**
+
+The installer includes the offline AI model; no Python or additional download is required. See the [public releases page](https://github.com/likhitbedi/SORTIQ-2.0/releases/tag/v2.0.3-beta) for release details. This is an unsigned beta, so scan the installer and test it with sample files first.
+
+
 **Status: functional desktop prototype, not a verified commercial product.**
 
 ## The experience
